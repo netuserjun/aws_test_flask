@@ -1,0 +1,33 @@
+
+
+.choose_engine_div{
+    display:flex; 
+    flex-direction:row; 
+    width: 500px;
+    margin: 250px auto auto auto;
+    align-items: center;
+}
+
+.crawl_engine{
+    width: 200px; 
+    text-align: center; 
+    margin: auto;
+}
+
+.upload_engine{
+    width: 200px; 
+    text-align: center; 
+    margin: auto;
+}
+
+.engine_button{
+    width: 200px;
+    height: 150px;
+    border: none;
+    border-radius: 1rem;
+    background-color: white;
+    font-size: 30px;
+}
+.enging_button_hover{
+
+}

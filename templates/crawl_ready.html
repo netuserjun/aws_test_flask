@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Danwoo Tech</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/crawl_ready.css') }}">
+    <script>
+        function updateTime() {
+          const timeDisplay = document.getElementById("time");
+          const now = new Date();
+          timeDisplay.innerHTML = now.toLocaleTimeString();
+        }
+  
+        setInterval(updateTime, 1000);
+    </script>
+    <script>
+        function increaseInputs() {
+          var numInputs = document.getElementById("num_inputs").value;
+          numInputs++;
+          document.getElementById("num_inputs").value = numInputs;
+          document.getElementById("form").submit();
+        }
+  
+        function addLabel() {
+          var labelInput = document.getElementById("new_label");
+          var label = labelInput.value;
+          labelInput.value = "";
+          var labels = document.getElementById("labels");
+          var newLabel = document.createElement("input");
+          newLabel.type = "hidden";
+          newLabel.name = "label";
+          newLabel.value = label;
+          labels.appendChild(newLabel);
+        }
+    </script>
+</head>
+ 
+<body onload="updateTime()">
+    <main>
+        <header>
+            <div class="header_left_div">
+                
+            </div>
+            <div class="header_logo">
+                <a href="/">
+                    <img style="width: 100%;height: auto;"src="static\images\logo.png">
+                </a>
+            </div>
+            <div class="header_time_div">
+                <div class="header_time_text" id="time"></div>
+            </div>
+
+        </header>
+
+        <div>
+            <form method="post">
+                {% for label in labels %}
+                  <p>{{ label }}: <input type="text" name="{{ label.lower() }}"></p>
+                {% endfor %}
+                <input type="submit" value="크롤링 시작">
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer_logo">
+            <h1>DanWoo Technology</h1>
+        </div>
+    </footer>
+
+</body>
+
+</html>

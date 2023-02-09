@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Danwoo Tech</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <script>
+        function updateTime() {
+          const timeDisplay = document.getElementById("time");
+          const now = new Date();
+          timeDisplay.innerHTML = now.toLocaleTimeString();
+        }
+  
+        setInterval(updateTime, 1000);
+      </script>
+</head>
+ 
+<body onload="updateTime()">
+    <main>
+        <header>
+            <div class="header_left_div">
+                
+            </div>
+            <div class="header_logo">
+                <a href="/">
+                    <img style="width: 100%;height: auto;"src="static\images\logo.png">
+                </a>
+            </div>
+            <div class="header_time_div">
+                <div class="header_time_text" id="time"></div>
+            </div>
+
+        </header>
+        
+        {% for text in texts %}
+            <p>{{text[0]}}:{{text[1]}}</p>
+        {% endfor %}
+
+    </main>
+    <footer>
+        <div class="footer_logo">
+            <h1>DanWoo Technology</h1>
+        </div>
+    </footer>
+
+</body>
+
+</html>
