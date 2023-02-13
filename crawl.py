@@ -14,8 +14,11 @@ from mimetypes import guess_extension
 import time
 from requests import get
 import datetime
-from absl import flags
-from absl import app
+from pyvirtualdisplay import Display 
+import sys
+
+display = Display(visible=0, size=(1920, 1080))
+display.start()
 
 def atoi(text):
     return int(text) if text.isdigit() else text
@@ -23,7 +26,7 @@ def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 def get_epochtime_ms():
     return round(datetime.datetime.utcnow().timestamp() * 1000)
-def download(outdir, url, file_name = None):
+def download(outdir_aws, url, file_name = None):
     if "http" not in url:
         #print("\\\\ 등장")
         url = "http:" + url
@@ -36,69 +39,81 @@ def download(outdir, url, file_name = None):
     else:
         file_name = url.split('/')[-1]
     if response.status_code == 200:
-	    with open(outdir+file_name, "wb") as file:
+	    with open(outdir_aws+file_name, "wb") as file:
                     file.write(response.content)
 
-def main(texts):
+def main(texts,host_ip,targets):
     chrome_options = webdriver.ChromeOptions()
-
+    log_dir ="/home/ec2-user/pyflask/src/log/%s/"%host_ip
+    #os.makedirs('/home/ec2-user/pyflask/src/finish/%s',exist_ok=True)
+    #os.system('mv /home/ec2-user/pyflask/src/log/%s /home/ec2-user/pyflask/src/finish/%s/log'%(host_ip,host_ip))
+    #os.system('mv /home/ec2-user/pyflask/src/out/%s /home/ec2-user/pyflask/src/finish/%s/crawl'%(host_ip,host_ip))
+    os.makedirs(os.path.dirname(log_dir), exist_ok=True)
+    sys.stdout = open("/home/ec2-user/pyflask/src/log/%s/script_output.log"%host_ip,"w")
     #chrome_options.add_argument('headless')
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)")
     #chrome_options.page_load_strategy = 'none'
     chrome_options.add_argument('lang=ko_KR')
     chrome_options.add_argument("--proxy-server='direct://'")
     chrome_options.add_argument("--proxy-bypass-list=*")
     chrome_options.add_argument("--disable-extensions")
 
-    driver = webdriver.Chrome("C:\\Users\\hks\\crawl\\chromedriver.exe",chrome_options=chrome_options)
-    
+    driver = webdriver.Chrome("/home/ec2-user/pyflask/chromedriver",chrome_options=chrome_options)
+    print("접속 아이피 : "+host_ip+"크롤링을 시작합니다.<br>")
+    sys.stdout.flush()
     new_texts = []
     for new_text in texts:
         newtext = new_text[1].replace("'","").strip()
         new_texts.append(newtext)
-    print(new_texts)
+    #print(new_texts)
     url_for_login=new_texts[0]
     url_for_search=new_texts[6]
 
     id = new_texts[1]
     pw = new_texts[2]
-    outdir = new_texts[9]
+
+    outdir_aws = "/home/ec2-user/pyflask/src/out/%s/"%host_ip
+    #outdir = new_texts[9]
 
     #target_txt=open("",'r',encoding='UTF8')
     #lines = target_txt.readlines()
     #print(lines)
     #lines = [line.strip() for line in lines ] 
-    lines = []
-    lines.append(new_texts[7])
-    print(lines)
+    #lines = []
+    #lines.append(new_texts[7])
+    #print(lines)
     #재고
 
     driver.get(url_for_login)
+    print("대상 쇼핑몰에 접속중입니다.<br>")
     time.sleep(3)
     driver.find_element(By.XPATH,new_texts[3]).send_keys(id)
     driver.find_element(By.XPATH,new_texts[4]).send_keys(pw)
     driver.find_element(By.XPATH,new_texts[5]).click()
+    print("로그인 완료<br>")
+    time.sleep(2)
 
-    time.sleep(5)
-
-    for target in lines:
-        print(target)
+    for target in targets:
+        print(target+" 크롤링 시작<br>")
+        sys.stdout.flush()
         target_url = url_for_search+target
         driver.get(target_url)
         time.sleep(3)
         driver.find_element(By.NAME,'keyword').send_keys(target)
 
+        time.sleep(1)
+        driver.find_element(By.XPATH,new_texts[7]).click()
         time.sleep(3)
-        driver.find_element(By.XPATH,new_texts[8]).click()
-        time.sleep(2)
 
-        thumbs = driver.find_elements_by_class_name('ThumbImage')
-        images = driver.find_elements_by_css_selector("img")
+        thumbs = driver.find_elements(By.CLASS_NAME,'ThumbImage')
+        images = driver.find_elements(By.CSS_SELECTOR,'img')
         img_url = []
         img_url1 = []
         thumb_url = []
-        asset_dir = outdir + target+"\\"
+        #print(thumb_url)
+        asset_dir = outdir_aws + target+"/"
         os.makedirs(os.path.dirname(asset_dir), exist_ok=True)
-        thumb_dir = asset_dir + "thumb\\"
+        thumb_dir = asset_dir + "thumb/"
         os.makedirs(os.path.dirname(thumb_dir), exist_ok=True)
 
         for image in images :
@@ -124,17 +139,18 @@ def main(texts):
         download_url =[]
         try:
             check = [s for s in img_url if "/newtalk" in s or "esmplus" in s]
-            print(check)
+            #print(check)
             check1 = [s for s in img_url1 if "/newtalk" in s or "esmplus" in s]
-            print(check1)
-            print(thumb_url)
+            #print(check1)
+            #print(thumb_url)
             download_url = check + check1 + thumb_url
         except:
             print("none")
 
         for url in download_url:
             download(asset_dir,url)
-            print(url + " download complete!")
+            print(url.split("/")[-1] + " download complete!<br>")
+            sys.stdout.flush()
         time.sleep(1)
 
         text = driver.find_element(By.XPATH,'//*[@id="prdDetail"]/div[3]/center').text
@@ -144,7 +160,8 @@ def main(texts):
         f.close()
 
         price = driver.find_element(By.XPATH,'//*[@id="contents"]/div[2]/div[2]/div[2]/div[4]/table/tbody/tr[2]/td/span').text
-        print(price)
+        print("상품가격 : "+price+"<br>")
+        sys.stdout.flush()
         price1 = price.split(" ")[0]
         with open(asset_dir+"price.txt",'w',encoding='UTF-8') as f:
                 f.write(price1)
@@ -153,9 +170,10 @@ def main(texts):
         f = open(asset_dir+"color_size.txt",'w',encoding='UTF-8')
         f.close()
         f = open(asset_dir+"color_size.txt", 'a', encoding='UTF-8')
-        select = Select(driver.find_element_by_id('product_option_id1'))
+        select = Select(driver.find_element(By.ID,'product_option_id1'))
         color_list = select.options
-        print(len(color_list))
+        #print(len(color_list))
+        sys.stdout.flush()
         color = ""
         size = ""
 
@@ -168,10 +186,11 @@ def main(texts):
                 print("color품절")
                 continue
             color = color_option + "  "
-            print("color : "+color)
+            print("color : "+color+"<br>")
+            sys.stdout.flush()
 
             try :
-                select2 = Select(driver.find_element_by_id('product_option_id2'))
+                select2 = Select(driver.find_element(By.ID,'product_option_id2'))
                 size_list = select2.options
                 size = ""
                 for c in range(2,len(size_list)):
@@ -190,5 +209,9 @@ def main(texts):
 
         f.close()
     driver.close()
+    product_count = len(glob.glob('/home/ec2-user/pyflask/src/out/%s/*'%host_ip))
+    sys.stdout.close()
+    sys.stdout = sys.__stdout__
+    return(product_count)
 
 

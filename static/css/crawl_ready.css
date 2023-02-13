@@ -1,0 +1,62 @@
+.container{
+    width : 100%;
+    height: 110vh;
+    margin: 50px 0 50px 0;
+    text-align: center;
+    display:flex;
+    align-items: center;
+}
+
+.left_div, .right_div{
+    width: 600px;
+    height: 100vh;
+    padding: 20px;
+    border: 2px solid rgb(100, 100, 100);
+    border-radius: 1rem;
+}
+
+.left_div {
+    margin: auto;
+    float: left;
+    text-align: center;
+}
+
+.right_div {
+    overflow-y: scroll;
+    float: right;
+    text-align: left;
+    margin : auto
+}
+
+.input_label{
+    width: 90%;
+    height: 50px;
+    font-weight: 800;
+}
+.input_text{
+    width: 50%;
+    float: right;
+}
+.submit_btn{
+    width: 150px;
+    height: 50px;
+    border: none;
+    border-radius: 1rem;
+    background-color: white;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.manual_text{
+    font-weight: 800;
+}
+.log_output{
+    overflow-y: scroll;
+    width : 800px;
+    height : 300px;
+    margin : auto;
+    border : 2px solid rgb(100,100,100);
+    border-radius:1rem;
+    padding : 10px;
+
+}

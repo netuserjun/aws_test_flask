@@ -36,6 +36,21 @@
           labels.appendChild(newLabel);
         }
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      function updateOutput() {
+        $.ajax({
+          url: "/log",
+          success: function(data) {
+            $("#output").html(data);
+          }
+        });
+      }
+
+      $(document).ready(function() {
+        setInterval(updateOutput, 1000);
+      });
+    </script>
 </head>
  
 <body onload="updateTime()">
@@ -55,14 +70,64 @@
 
         </header>
 
-        <div>
-            <form method="post">
+<div class="container">
+        <div class="left_div">
+            
+            <form method="post" enctype="multipart/form-data">
+                <h1>필수 데이터 입력</h1>
                 {% for label in labels %}
-                  <p>{{ label }}: <input type="text" name="{{ label.lower() }}"></p>
+                  <p class="input_label">{{ label }}: <input class="input_text"type="text" name="{{ label.lower() }}"></p>
                 {% endfor %}
-                <input type="submit" value="크롤링 시작">
+                <p class="input_label">9. 수집할 상품명 텍스트파일<input class="input_text" type="file" name="file"></p>
+                <input class="submit_btn" type="submit" value="크롤링 시작">
             </form>
+
         </div>
+        <div class="right_div">
+            <h1>사용방법</h1>
+            <div class="manual">
+                <p class="manual_text">1. 크롤링할 대상 쇼핑몰의 로그인 페이지 url을 적어주세요. <br>
+                    ex) http://www.danharoo.com/member/login.html
+                </p>
+                <p class="manual_text">2. 계정 아이디를 입력해주세요.</p>
+                <p class="manual_text">3. 계정 비밀번호를 입력해주세요.</p>
+                <p class="manual_text">4. 쇼핑몰 로그인 페이지에서 Ctrl + Shift + i를 눌러 개발자도구를 열어주세요. <br>
+                    개발자 도구가 열렸다면 Ctrl + Shift + c를 눌러주세요.<br>
+                    그리고 쇼핑몰의 아이디 입력부분을 클릭하면 우측 개발자도구에 파랗게 변한 부분이 있습니다.<br>
+                    파랗게 변한 부분에 우클릭을 하고 'Copy' 탭 안에 있는 'Copy XPath'를 클릭합니다.</p>
+                <p class="manual_text">
+                    <img style="width: 100%;height: auto;"src="static\images\4.jpg">
+                    크롤링 페이지로 돌아와서 'ID Selector' 탭에 붙여넣기를 합니다.<br>
+                    만약 'Copy XPath'를 이용한 크롤링이 동작하지 않는다면 'Copy full XPath'를 이용합니다.
+                </p>
+                <p class="manual_text">5. 같은 방법으로 비밀번호 입력창의 XPath도 입력해주세요.</p>
+                <p class="manual_text">6. 같은 방법으로 로그인 버튼의 입력창의 XPath도 입력해주세요.</p>
+                <p class="manual_text">7. 쇼핑몰의 검색 url을 입력합니다.<br>
+                예를 들어 쇼핑몰에서 "청바지"를 검색했을 때 검색 결과 페이지의 url이 <br>
+                'http://www.danharoo.com/product/search.html?banner_action=&keyword=%EC%B2%AD%EB%B0%94%EC%A7%80'와 같은 형식이라면 <br>
+                'http://www.danharoo.com/product/search.html?banner_action=&keyword=' 까지만 입력하면 됩니다.</p>
+                <p class="manual_text">8. 검색결과로 나온 상품을 클릭할 수 있는 XPath 경로입니다.<br>
+                    예를 들어 검색결과 화면이 아래와 같을 때 대상 상품의 페이지로 이동할 수 있는 이미지 혹은 텍스트 등의 경로입니다.<br>
+                    <img style="width: 100%;height: auto;"src="static\images\8.jpg">
+                    복사한 XPath를 붙여넣습니다.
+                </p>
+                <p class="manual_text">
+                    9. 검색할 대상 상품명들이 적힌 텍스트 파일입니다.
+                    텍스트파일 내용은 아래 사진과 같이 한 줄에 하나의 상품명을 기입해주시면 됩니다.<br>
+                    <img style="width: 100%;height: auto;"src="static\images\9.jpg">
+                </p>
+		<p class="manual_text">10. 모든 정보를 입력하셨다면 크롤링 시작 버튼을 눌러주세요.<br>
+		서버의 동작 상태는 Server Output 창에서 확인할 수 있습니다.<br>
+		    동작이 완료될 때까지 창을 닫지 말아주세요.</p>
+
+
+            </div>
+        </div>
+    </div>
+
+	<h1>Server Output</h1>
+	<div class="log_output" id="output"></div>
+
     </main>
 
     <footer>
